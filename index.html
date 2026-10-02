@@ -401,3 +401,1365 @@ footer .k{color:var(--or);font-weight:700}
                 <label>Visibilité</label>
                 <select id="newTeam">
                     <option value="both">
+                        <option value="u13">🟠 U13 uniquement</option>
+<option value="u12">🔵 U12 uniquement</option>
+</select>
+</div>
+<div class="field">
+<label>Thème</label>
+<select id="newTheme"></select>
+</div>
+<div class="field">
+<label>Ou nouveau thème</label>
+<input type="text" id="newThemeCustom" placeholder="ex: arbitrage" maxlength="30">
+</div>
+<div class="field">
+<label>Question</label>
+<textarea id="newQuestion" placeholder="Ex: Combien de joueurs sur le terrain ?"></textarea>
+</div>
+<div class="field">
+<label>Réponses (coche la bonne)</label>
+<div class="answer-edit"><input type="radio" class="radio" name="correct" value="0" checked><input type="text" id="ans0" placeholder="Réponse A"></div>
+<div class="answer-edit"><input type="radio" class="radio" name="correct" value="1"><input type="text" id="ans1" placeholder="Réponse B"></div>
+<div class="answer-edit"><input type="radio" class="radio" name="correct" value="2"><input type="text" id="ans2" placeholder="Réponse C"></div>
+<div class="answer-edit"><input type="radio" class="radio" name="correct" value="3"><input type="text" id="ans3" placeholder="Réponse D"></div>
+</div>
+<div class="field">
+<label>Explication (optionnel)</label>
+<input type="text" id="newExplanation" placeholder="Pourquoi cette réponse est correcte...">
+</div>
+<button class="btn btn-vert" id="btnSaveQuestion">💾 Enregistrer</button>
+<button class="btn btn-gris btn-small" id="btnEditorBack">← Retour</button>
+</div>
+</div>
+
+<div class="screen" id="screen-admin-bulk">
+<div class="card">
+<div class="card-title">📥 Import en masse (JSON)</div>
+<p style="font-size:.72rem;color:var(--dim);margin-bottom:10px;line-height:1.6;">
+Collez un tableau JSON. Format :<br>
+<code style="background:var(--gris);padding:2px 6px;border-radius:4px;font-size:.7rem;">[{"theme":"regles","q":"...","a":["A","B","C","D"],"correct":0,"exp":"..."}]</code>
+</p>
+<p style="font-size:.68rem;color:var(--or);margin-bottom:10px;font-style:italic;" id="bulkTeamHint"></p>
+<div class="field">
+<textarea id="bulkJson" placeholder='[{"theme":"regles","q":"Question ?","a":["Oui","Non","Peut-être","Jamais"],"correct":0,"exp":"Explication"}]' style="min-height:200px;font-family:monospace;font-size:.75rem;"></textarea>
+</div>
+<button class="btn btn-vert" id="btnBulkSave">📥 Importer</button>
+<button class="btn btn-gris btn-small" id="btnBulkBack">← Retour</button>
+</div>
+</div>
+
+<div class="screen" id="screen-admin-weekly">
+<div class="card">
+<div class="card-title">📅 Créer le quiz de la semaine <span id="weeklyCreateCat"></span></div>
+<div class="field">
+<label>Nom du quiz</label>
+<input type="text" id="weeklyLabel" placeholder="ex: Semaine du 25 septembre" maxlength="60">
+</div>
+<div class="field">
+<label>Nombre de questions</label>
+<select id="weeklyNb">
+<option value="10">10 questions</option>
+<option value="20" selected>20 questions</option>
+<option value="25">25 questions</option>
+<option value="30">30 questions</option>
+</select>
+</div>
+<div class="field">
+<label>Thèmes</label>
+<select id="weeklyTheme"><option value="all">🎲 Tous les thèmes</option></select>
+</div>
+<div class="field">
+<label>⏱️ Temps par question</label>
+<select id="weeklyTimer">
+<option value="0">♾️ Pas de limite</option>
+<option value="15">15 secondes</option>
+<option value="20" selected>20 secondes</option>
+<option value="30">30 secondes</option>
+<option value="45">45 secondes</option>
+</select>
+</div>
+<p style="font-size:.7rem;color:var(--dim);margin:10px 0;line-height:1.5;">
+Les questions seront tirées au hasard parmi les questions de cette catégorie + les questions partagées.
+</p>
+<button class="btn btn-or" id="btnWeeklySave">🚀 Publier le quiz</button>
+<button class="btn btn-gris btn-small" id="btnWeeklyBack">← Retour</button>
+</div>
+</div>
+
+<div class="screen" id="screen-admin-sessions">
+<div class="card">
+<div class="card-title">📜 Historique des quiz <span id="sessionsCatLabel"></span></div>
+<div id="sessionsList"></div>
+</div>
+<button class="btn btn-gris" id="btnSessionsBack">← Retour</button>
+</div>
+
+<div class="screen" id="screen-admin-results">
+<div class="card">
+<div class="card-title">📋 Résultats par joueur <span id="resultsCatLabel"></span></div>
+<div class="field">
+<input type="text" id="searchPlayer" placeholder="🔍 Rechercher un joueur…" autocomplete="off">
+</div>
+<p style="font-size:.7rem;color:var(--dim);margin-bottom:10px;line-height:1.5;">
+👆 Clique sur un joueur pour voir son bulletin détaillé.
+</p>
+<div id="allResults" class="leaderboard">
+<div class="loader">Chargement…</div>
+</div>
+</div>
+<button class="btn btn-gris" id="btnResultsBack">← Retour</button>
+</div>
+
+<div class="screen" id="screen-player-detail">
+<div id="playerDetailContent"></div>
+<button class="btn btn-gris" id="btnDetailBack">← Retour à la liste</button>
+</div>
+
+</div>
+
+<footer>
+<span class="k">Trélissac FC</span> · Quiz PEF v5.0 · U12 / U13
+</footer>
+
+<div class="toast" id="toast"></div>
+    <script type="module">
+const firebaseConfig = {
+  apiKey: "AIzaSyDkRv7rVzgkPvhFKHfQaGWGNnrIl5UEZws",
+  authDomain: "quizz-u13-tfc.firebaseapp.com",
+  projectId: "quizz-u13-tfc",
+  storageBucket: "quizz-u13-tfc.firebasestorage.app",
+  messagingSenderId: "986436583785",
+  appId: "1:986436583785:web:9b4ef40756f6673e003df8"
+};
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import {
+  getFirestore, collection, addDoc, getDocs, deleteDoc, doc, getDoc, setDoc,
+  query, orderBy, where, limit as fbLimit, serverTimestamp
+} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+let db = null;
+
+const DEFAULT_THEMES = [
+  { id: 'regles',       label: '⚽ Règles du jeu' },
+  { id: 'fairplay',     label: '🤝 Fair-play' },
+  { id: 'sante',        label: '🏃 Santé' },
+  { id: 'environnement',label: '🌍 Environnement' },
+  { id: 'citoyen',      label: '🏛️ Engagement citoyen' },
+  { id: 'culture',      label: '🌟 Culture Foot' }
+];
+
+let THEMES = DEFAULT_THEMES.slice();
+
+function themeLabel(id) {
+  for (const t of THEMES) if (t.id === id) return t.label;
+  return id;
+}
+
+const SEED_QUESTIONS = [
+  {theme:'regles',q:"Comment appelle-t-on officiellement le \"penalty\" ?",a:["Un coup de pied de coin","Un coup de pied de réparation","Un coup franc direct","Un jet de touche"],correct:1,exp:"Le \"coup de pied de réparation\" est le terme exact utilisé par les arbitres."},
+  {theme:'regles',q:"Combien de joueurs composent une équipe de Foot à 8 sur le terrain ?",a:["7 joueurs","8 joueurs","9 joueurs","10 joueurs"],correct:1,exp:"En Foot à 8, il y a 8 joueurs sur le terrain, dont un gardien."},
+  {theme:'regles',q:"Quelle est la durée d'un match de U13 ?",a:["2 × 25 minutes","2 × 30 minutes","2 × 35 minutes","2 × 40 minutes"],correct:2,exp:"Les matchs U13 se jouent en 2 × 35 minutes."},
+  {theme:'regles',q:"À quelle distance se trouve le point de réparation en Foot à 8 ?",a:["6 mètres","9 mètres","10 mètres","11 mètres"],correct:1,exp:"Le point de réparation est à 9 mètres de la ligne de but."},
+  {theme:'regles',q:"Un joueur reçoit un carton rouge. Que se passe-t-il ?",a:["Il est averti","Il est exclu définitivement","Il sort 5 minutes","Rien du tout"],correct:1,exp:"Le carton rouge signifie une expulsion définitive."},
+  {theme:'regles',q:"Quelle est la dimension de la surface de réparation en Foot à 8 ?",a:["16,5 m x 40 m","13 m x 26 m","9 m x 18 m","20 m x 30 m"],correct:1,exp:"La surface de réparation mesure 26 m de large sur 13 m de profondeur."},
+  {theme:'regles',q:"À quelle distance minimum les adversaires doivent-ils se trouver sur un coup franc en Foot à 8 ?",a:["5 mètres","6 mètres","9,15 mètres","10 mètres"],correct:1,exp:"En Foot à 8, la distance est de 6 mètres."},
+  {theme:'regles',q:"Quelle est la taille du ballon utilisée en U13 ?",a:["Taille 3","Taille 4","Taille 5","Taille 2"],correct:1,exp:"Les U13 jouent avec un ballon taille 4."},
+  {theme:'fairplay',q:"Que fais-tu après un match, peu importe le résultat ?",a:["Je rentre chez moi","Je serre la main de l'adversaire et de l'arbitre","Je vais voir mes parents","Je bois un verre d'eau"],correct:1,exp:"Le fair-play, c'est respecter l'adversaire et l'arbitre."},
+  {theme:'fairplay',q:"Ton coéquipier rate un but facile. Que fais-tu ?",a:["Je l'engueule","Je l'encourage","Je l'ignore","Je le remplace"],correct:1,exp:"Un bon coéquipier encourage, il ne critique pas."},
+  {theme:'fairplay',q:"L'arbitre siffle une faute contre toi. Tu penses qu'il a tort. Que fais-tu ?",a:["Je crie dessus","Je continue à jouer sans rien dire","Je proteste","Je sors du terrain"],correct:1,exp:"On respecte toujours la décision de l'arbitre."},
+  {theme:'fairplay',q:"Un adversaire tombe blessé. Que fais-tu ?",a:["Je continue à jouer","Je m'arrête et j'appelle l'arbitre","Je rigole","Je prends le ballon"],correct:1,exp:"On arrête toujours le jeu quand un adversaire est blessé."},
+  {theme:'fairplay',q:"Ton équipe perd 5-0. Que fais-tu ?",a:["J'abandonne","Je continue à jouer et j'encourage mes coéquipiers","Je m'énerve","Je sors du terrain"],correct:1,exp:"On ne baisse jamais les bras."},
+  {theme:'fairplay',q:"Ton adversaire marque un beau but. Que fais-tu ?",a:["Je l'insulte","Je le félicite","Je l'ignore","Je me moque"],correct:1,exp:"Reconnaître la qualité de l'adversaire, c'est du fair-play."},
+  {theme:'sante',q:"Combien de temps avant un match faut-il manger ?",a:["5 minutes","30 minutes","2 à 3 heures","On ne mange pas avant"],correct:2,exp:"Il faut manger 2 à 3 heures avant un effort."},
+  {theme:'sante',q:"Que faut-il boire pendant un match ?",a:["Du soda","De l'eau","Du jus de fruit","Rien"],correct:1,exp:"L'eau est la meilleure boisson pour s'hydrater."},
+  {theme:'sante',q:"Pourquoi faut-il s'échauffer avant un match ?",a:["Pour perdre du temps","Pour éviter les blessures","Pour impressionner l'adversaire","Ce n'est pas utile"],correct:1,exp:"L'échauffement prépare les muscles."},
+  {theme:'sante',q:"Combien d'heures de sommeil faut-il pour bien récupérer ?",a:["4 heures","6 heures","8 à 10 heures","12 heures"],correct:2,exp:"Un jeune sportif a besoin de 8 à 10 heures de sommeil."},
+  {theme:'sante',q:"Que fais-tu si tu as mal pendant l'entraînement ?",a:["Je continue","Je le dis à mon éducateur","Je serre les dents","Je rentre chez moi"],correct:1,exp:"Il faut toujours prévenir son éducateur en cas de douleur."},
+  {theme:'sante',q:"Que faut-il manger avant un match ?",a:["Un hamburger","Des pâtes ou du riz","Des frites","Des bonbons"],correct:1,exp:"Les féculents donnent de l'énergie longue durée."},
+  {theme:'environnement',q:"Que fais-tu de tes papiers de goûter après l'entraînement ?",a:["Je les jette par terre","Je les mets dans mon sac et je les jette à la maison","Je les laisse dans le vestiaire","Je les donne à un copain"],correct:1,exp:"On ne laisse rien traîner."},
+  {theme:'environnement',q:"Pourquoi faut-il économiser l'eau ?",a:["Parce que c'est cher","Parce que c'est une ressource précieuse","Parce que ça prend du temps","Ce n'est pas important"],correct:1,exp:"L'eau potable est une ressource limitée."},
+  {theme:'environnement',q:"Que fais-tu si tu vois un déchet sur le terrain ?",a:["Je l'ignore","Je le ramasse et je le jette","Je le mets dans le sac d'un copain","Je le pousse avec le pied"],correct:1,exp:"Un terrain propre, c'est mieux pour tout le monde."},
+  {theme:'environnement',q:"Pour venir au stade, quel est le moyen de transport le plus écologique ?",a:["La voiture individuelle","Le covoiturage ou le vélo","La moto","Le bus seul"],correct:1,exp:"Le covoiturage et le vélo réduisent les émissions."},
+  {theme:'citoyen',q:"Que fais-tu si tu vois un coéquipier embêter un autre ?",a:["Je regarde","J'en parle à l'éducateur","Je ris","Je filme"],correct:1,exp:"On ne laisse jamais quelqu'un être embêté."},
+  {theme:'citoyen',q:"Que veut dire \"être citoyen\" ?",a:["Avoir 18 ans","Respecter les autres et les règles","Voter","Payer des impôts"],correct:1,exp:"Être citoyen, c'est respecter les autres."},
+  {theme:'citoyen',q:"Un nouveau joueur arrive dans l'équipe. Que fais-tu ?",a:["Je l'ignore","Je vais lui parler et l'intégrer","Je me moque de lui","J'attends qu'il vienne"],correct:1,exp:"L'intégration d'un nouveau, c'est le rôle de tous."},
+  {theme:'citoyen',q:"Que fais-tu si un coéquipier est victime de moqueries ?",a:["Je ris","Je le défends et je préviens un adulte","Je ne dis rien","Je filme"],correct:1,exp:"On ne laisse jamais quelqu'un être harcelé."},
+  {theme:'culture',q:"Quelle est la devise de la Fédération Française de Football ?",a:["Le Football comme lien, la Fédération comme force","Gagner ensemble","Le football pour tous","Fair-play et respect"],correct:0,exp:"La devise de la FFF est \"Le Football comme lien, la Fédération comme force\"."},
+  {theme:'culture',q:"Comment s'appelait le football avant d'être un sport codifié ?",a:["Le rugby","La Soule","Le handball","Le calcio"],correct:1,exp:"La Soule est l'ancêtre du football."},
+  {theme:'culture',q:"Qui a remporté la dernière Coupe du Monde masculine en 2022 ?",a:["La France","Le Brésil","L'Argentine","L'Allemagne"],correct:2,exp:"L'Argentine a gagné face à la France."},
+  {theme:'culture',q:"Qui a remporté la dernière Coupe du Monde féminine en 2023 ?",a:["Les États-Unis","L'Angleterre","L'Espagne","La France"],correct:2,exp:"L'Espagne a remporté la Coupe du Monde Féminine 2023."},
+  {theme:'culture',q:"Que signifie le sigle \"PEF\" ?",a:["Programme d'Entraînement Football","Programme Éducatif Fédéral","Plan d'Éducation Football","Pays d'Europe Football"],correct:1,exp:"Le PEF est le Programme Éducatif Fédéral de la FFF."},
+  {theme:'culture',q:"Où se déroule la Coupe du Monde Féminine 2027 ?",a:["En France","Aux États-Unis","Au Brésil","En Espagne"],correct:2,exp:"La Coupe du Monde Féminine 2027 aura lieu au Brésil."}
+];
+        const state = {
+  category: 'u13',
+  role: null,
+  adminCategory: 'u13',
+  playerName: '',
+  mode: 'training',
+  theme: 'all',
+  nbQuestions: 20,
+  timerDuration: 20,
+  questions: [],
+  currentIndex: 0,
+  score: 0,
+  answered: false,
+  timer: null,
+  timeLeft: 0,
+  timerActive: false,
+  allQuestions: [],
+  activeSessions: { u12: null, u13: null },
+  config: {},
+  lbMode: 'weekly',
+  responses: []
+};
+
+function $(id) { return document.getElementById(id); }
+
+function toast(msg) {
+  const el = $('toast');
+  if (!el) return;
+  el.textContent = msg;
+  el.classList.add('visible');
+  setTimeout(() => el.classList.remove('visible'), 2500);
+}
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  const target = $(id);
+  if (target) target.classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+function shuffle(array) {
+  const arr = array.slice();
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+function shuffleAnswers(q) {
+  const indices = shuffle([0, 1, 2, 3]);
+  const newA = [];
+  let newCorrect = 0;
+  for (let i = 0; i < indices.length; i++) {
+    newA.push(q.a[indices[i]]);
+    if (indices[i] === q.correct) newCorrect = i;
+  }
+  return { ...q, a: newA, correct: newCorrect };
+}
+
+function formatDate(ts) {
+  if (!ts) return '—';
+  try {
+    let d = ts.toDate ? ts.toDate() : new Date(ts);
+    return d.toLocaleString('fr-FR', { day:'2-digit', month:'2-digit', year:'2-digit', hour:'2-digit', minute:'2-digit' });
+  } catch (e) { return '—'; }
+}
+
+function escapeHtml(s) {
+  return String(s == null ? '' : s)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+}
+
+function showError(msg, detail) {
+  $('errorMsg').textContent = msg;
+  $('errorDetail').value = detail || '';
+  showScreen('screen-error');
+}
+
+function catLabel(c) { return c === 'u12' ? '🔵 U12' : '🟠 U13'; }
+function catBadge(c) {
+  if (c === 'u12') return '<span class="badge-u12">U12</span>';
+  if (c === 'u13') return '<span class="badge-u13">U13</span>';
+  return '<span class="badge-shared">PARTAGÉE</span>';
+}
+
+async function fbGetScoresLight() {
+  const q = query(collection(db, 'scores'), orderBy('createdAt', 'desc'), fbLimit(300));
+  const snap = await getDocs(q);
+  return snap.docs.map(d => {
+    const data = d.data();
+    delete data.responses;
+    return { id: d.id, ...data };
+  });
+}
+async function fbGetScoresFull() {
+  const q = query(collection(db, 'scores'), orderBy('createdAt', 'desc'), fbLimit(300));
+  const snap = await getDocs(q);
+  return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+}
+async function fbGetQuestions() {
+  const snap = await getDocs(collection(db, 'questions'));
+  return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+}
+async function fbAddQuestion(q) {
+  return addDoc(collection(db, 'questions'), { ...q, createdAt: serverTimestamp() });
+}
+async function fbDeleteQuestion(id) { return deleteDoc(doc(db, 'questions', id)); }
+async function fbAddScore(entry) {
+  return addDoc(collection(db, 'scores'), { ...entry, createdAt: serverTimestamp() });
+}
+async function fbGetConfig() {
+  const d = await getDoc(doc(db, 'config', 'main'));
+  return d.exists() ? d.data() : {};
+}
+async function fbSetConfig(data) {
+  return setDoc(doc(db, 'config', 'main'), data, { merge: true });
+}
+async function fbGetSession(id) {
+  if (!id) return null;
+  const d = await getDoc(doc(db, 'sessions', id));
+  return d.exists() ? { id: d.id, ...d.data() } : null;
+}
+async function fbGetActiveSessions() {
+  const cfg = await fbGetConfig();
+  const sessions = cfg.activeSessions || {};
+  let u13Id = sessions.u13;
+  let u12Id = sessions.u12;
+  if (!u13Id && cfg.activeSessionId) u13Id = cfg.activeSessionId;
+  const [u13, u12] = await Promise.all([fbGetSession(u13Id), fbGetSession(u12Id)]);
+  return { u12, u13 };
+}
+async function fbCreateSession(data, cat) {
+  const ref = await addDoc(collection(db, 'sessions'), { ...data, team: cat, createdAt: serverTimestamp() });
+  const cfg = await fbGetConfig();
+  const sessions = cfg.activeSessions || {};
+  sessions[cat] = ref.id;
+  await fbSetConfig({ activeSessions: sessions });
+  return ref.id;
+}
+async function fbGetSessions() {
+  const q = query(collection(db, 'sessions'), orderBy('createdAt', 'desc'), fbLimit(100));
+  const snap = await getDocs(q);
+  return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+}
+async function fbHasDoneSession(playerName, sessionId) {
+  const q = query(
+    collection(db, 'scores'),
+    where('playerNameLower', '==', playerName.toLowerCase()),
+    where('quizId', '==', sessionId)
+  );
+  const snap = await getDocs(q);
+  return snap.docs.length > 0 ? snap.docs[0].data() : null;
+}
+async function fbFindScoresByName(name) {
+  const q = query(collection(db, 'scores'), where('playerNameLower', '==', name.toLowerCase()));
+  const snap = await getDocs(q);
+  return snap.docs.map(d => ({ id: d.id, ...d.data() }));
+}
+async function fbDeleteScore(id) { return deleteDoc(doc(db, 'scores', id)); }
+
+function withTimeout(promise, ms, label) {
+  const timeout = new Promise((_, reject) =>
+    setTimeout(() => reject(new Error('Timeout (' + ms + 'ms) — ' + (label || 'la base ne répond pas'))), ms)
+  );
+  return Promise.race([promise, timeout]);
+}
+
+function getPins() {
+  const c = state.config || {};
+  if (c.pins) {
+    return {
+      super: c.pins.super || '0203',
+      u12:   c.pins.u12   || '1212',
+      u13:   c.pins.u13   || '1313'
+    };
+  }
+  return {
+    super: c.pin || '0203',
+    u12:   '1212',
+    u13:   '1313'
+  };
+}
+
+function roleFromPin(pin) {
+  const p = getPins();
+  if (pin === p.super) return 'super';
+  if (pin === p.u12)   return 'u12';
+  if (pin === p.u13)   return 'u13';
+  return null;
+}
+
+function questionsForCategory(cat) {
+  return state.allQuestions.filter(q => {
+    const t = q.team || 'both';
+    return t === 'both' || t === cat;
+  });
+}
+
+function canEditQuestion(q) {
+  if (state.role === 'super') return true;
+  const t = q.team || 'both';
+  return t === state.adminCategory;
+}
+
+function scoreCategory(s) {
+  return s.team || 'u13';
+}
+
+async function init() {
+  try {
+    const app = initializeApp(firebaseConfig);
+    db = getFirestore(app);
+    console.log('✅ Firebase initialisé');
+
+    state.config = await withTimeout(fbGetConfig(), 20000, 'config');
+
+    if (!state.config.seeded) {
+      const existing = await withTimeout(fbGetQuestions(), 20000, 'questions');
+      if (existing.length === 0) {
+        console.log('🌱 Import des questions de démarrage…');
+        for (const q of SEED_QUESTIONS) {
+          await fbAddQuestion({ ...q, team: 'both' });
+        }
+        await fbSetConfig({ seeded: true });
+        state.config = await fbGetConfig();
+      } else {
+        await fbSetConfig({ seeded: true });
+      }
+    }
+
+    if (!state.config.pins) {
+      console.log('🔐 Installation des PIN v5.0…');
+      await fbSetConfig({ pins: { super: '0203', u12: '1212', u13: '1313' } });
+      state.config = await fbGetConfig();
+    }
+
+    if (state.config.customThemes && Array.isArray(state.config.customThemes)) {
+      for (const t of state.config.customThemes) {
+        if (!THEMES.find(x => x.id === t.id)) THEMES.push(t);
+      }
+    }
+
+    const urlCat = new URLSearchParams(location.search).get('cat');
+    if (urlCat === 'u12' || urlCat === 'u13') {
+      state.category = urlCat;
+    }
+
+    await refreshAllData();
+
+    if (urlCat === 'u12' || urlCat === 'u13') {
+      showScreen('screen-home');
+    } else {
+      showScreen('screen-category');
+    }
+  } catch (err) {
+    console.error('Init error:', err);
+    showError('Connexion à la base impossible',
+      (err.message || err.toString()) + '\n\nVérifiez votre connexion internet.');
+  }
+}
+
+async function refreshAllData() {
+  state.allQuestions = await withTimeout(fbGetQuestions(), 20000, 'questions');
+  state.activeSessions = await withTimeout(fbGetActiveSessions(), 20000, 'sessions');
+  renderThemeCounts();
+  renderThemeSelects();
+  renderCategoryBanner();
+  renderWeeklyCard();
+}
+
+function renderCategoryBanner() {
+  const lbl = $('catLabel');
+  if (lbl) {
+    const c = state.category;
+    const style = c === 'u12' ? 'color:var(--u12)' : 'color:var(--u13)';
+    lbl.innerHTML = `<span style="${style}">${catLabel(c)}</span>`;
+  }
+  const homeLb = $('homeLbCat');
+  if (homeLb) homeLb.innerHTML = catBadge(state.category);
+}
+
+function renderThemeCounts() {
+  const pool = questionsForCategory(state.category);
+  const counts = {};
+  for (const t of THEMES) counts[t.id] = 0;
+  for (const q of pool) {
+    if (counts[q.theme] === undefined) counts[q.theme] = 0;
+    counts[q.theme]++;
+  }
+  for (const k of Object.keys(counts)) {
+    if (!THEMES.find(t => t.id === k)) THEMES.push({ id: k, label: k });
+  }
+  const html = THEMES.map(t => `<div class="tc"><span class="n">${counts[t.id]||0}</span><span class="t">${t.label}</span></div>`).join('');
+  const el1 = $('themeCount'); if (el1) el1.innerHTML = html;
+  const el2 = $('adminThemeCount'); if (el2) el2.innerHTML = html;
+}
+
+function renderThemeSelects() {
+  const opts = THEMES.map(t => `<option value="${t.id}">${t.label}</option>`).join('');
+  const sel1 = $('themeSelect');
+  if (sel1) sel1.innerHTML = '<option value="all">🎲 Tout mélangé</option>' + opts;
+  const sel2 = $('newTheme');
+  if (sel2) sel2.innerHTML = opts;
+  const sel3 = $('weeklyTheme');
+  if (sel3) sel3.innerHTML = '<option value="all">🎲 Tous les thèmes</option>' + opts;
+}
+
+function renderWeeklyCard() {
+  const card = $('weeklyCard');
+  const info = $('weeklyInfo');
+  const btn = $('btnWeekly');
+  if (!card) return;
+  const session = state.activeSessions[state.category];
+  if (!session) { card.style.display = 'none'; return; }
+  card.style.display = 'block';
+  info.innerHTML = `
+    <div class="w-label">📅 Quiz de la semaine — ${catLabel(state.category)}</div>
+    <div class="w-title">${escapeHtml(session.label)}</div>
+    <div class="w-meta">${session.questionIds.length} questions · ${session.timer === 0 ? 'sans limite' : session.timer + 's/question'}</div>
+  `;
+  const name = $('playerName').value.trim();
+  if (name) {
+    fbHasDoneSession(name, session.id).then(prev => {
+      if (prev) {
+        btn.disabled = true;
+        btn.classList.add('btn-locked');
+        btn.innerHTML = `✅ Déjà fait — ${prev.score}/${prev.total}`;
+      } else {
+        btn.disabled = false;
+        btn.classList.remove('btn-locked');
+        btn.innerHTML = '🚀 Commencer le quiz de la semaine';
+      }
+    }).catch(() => {});
+  }
+}function startTimer() {
+  stopTimer();
+  if (state.timerDuration === 0) { $('timerContainer').style.display = 'none'; return; }
+  $('timerContainer').style.display = 'block';
+  state.timeLeft = state.timerDuration;
+  state.timerActive = true;
+  updateTimerDisplay();
+  state.timer = setInterval(() => {
+    if (!state.timerActive) return;
+    state.timeLeft--;
+    updateTimerDisplay();
+    if (state.timeLeft <= 0) { stopTimer(); timeUp(); }
+  }, 1000);
+}
+function stopTimer() {
+  if (state.timer) clearInterval(state.timer);
+  state.timer = null;
+  state.timerActive = false;
+}
+function updateTimerDisplay() {
+  const total = state.timerDuration;
+  const left = state.timeLeft;
+  const fill = $('timerFill');
+  const seconds = $('timerSeconds');
+  if (!fill || !seconds) return;
+  fill.style.width = (left / total * 100) + '%';
+  seconds.textContent = left + 's';
+  fill.classList.remove('warning', 'danger');
+  seconds.classList.remove('warning', 'danger');
+  const ratio = left / total;
+  if (ratio <= 0.25) { fill.classList.add('danger'); seconds.classList.add('danger'); }
+  else if (ratio <= 0.5) { fill.classList.add('warning'); seconds.classList.add('warning'); }
+}
+function timeUp() {
+  if (state.answered) return;
+  state.answered = true;
+  const q = state.questions[state.currentIndex];
+  state.responses.push({
+    q: q.q, theme: q.theme, options: q.a.slice(),
+    selectedIdx: -1, correctIdx: q.correct, isCorrect: false,
+    exp: q.exp || '', timeout: true
+  });
+  document.querySelectorAll('.answer').forEach((b, i) => {
+    b.disabled = true;
+    if (i === q.correct) b.classList.add('correct');
+  });
+  toast('⏰ Temps écoulé !');
+  if (state.mode === 'training') {
+    $('explanationBox').innerHTML = `<div class="explanation">⏰ Temps écoulé ! Bonne réponse : <strong>${escapeHtml(q.a[q.correct])}</strong><br><br>💡 ${escapeHtml(q.exp||'')}</div>`;
+    const nextBtn = $('btnNext');
+    nextBtn.style.display = 'block';
+    nextBtn.textContent = state.currentIndex < state.questions.length - 1 ? 'Question suivante →' : 'Voir mon score →';
+  } else {
+    setTimeout(() => {
+      if (state.currentIndex < state.questions.length - 1) { state.currentIndex++; displayQuestion(); }
+      else finishQuiz();
+    }, 1200);
+  }
+}
+
+function displayQuestion() {
+  const orig = state.questions[state.currentIndex];
+  const q = shuffleAnswers(orig);
+  state.questions[state.currentIndex] = q;
+  state.answered = false;
+  const total = state.questions.length;
+  const current = state.currentIndex + 1;
+  $('questionCounter').textContent = `Question ${current} / ${total}`;
+  $('progressFill').style.width = ((current - 1) / total * 100) + '%';
+  $('questionTheme').textContent = themeLabel(q.theme);
+  $('questionText').textContent = q.q;
+  const container = $('answersContainer');
+  container.innerHTML = '';
+  q.a.forEach((txt, idx) => {
+    const btn = document.createElement('button');
+    btn.className = 'answer';
+    btn.textContent = txt;
+    btn.addEventListener('click', () => selectAnswer(idx));
+    container.appendChild(btn);
+  });
+  $('explanationBox').innerHTML = '';
+  $('btnNext').style.display = 'none';
+  startTimer();
+}
+
+function selectAnswer(index) {
+  if (state.answered) return;
+  state.answered = true;
+  stopTimer();
+  const q = state.questions[state.currentIndex];
+  state.responses.push({
+    q: q.q, theme: q.theme, options: q.a.slice(),
+    selectedIdx: index, correctIdx: q.correct, isCorrect: index === q.correct,
+    exp: q.exp || '', timeout: false
+  });
+  document.querySelectorAll('.answer').forEach((b, i) => {
+    b.disabled = true;
+    if (i === q.correct) b.classList.add('correct');
+    if (i === index && i !== q.correct) b.classList.add('wrong');
+  });
+  if (index === q.correct) {
+    state.score++;
+    if (state.mode === 'training') toast('✅ Bonne réponse !');
+  } else if (state.mode === 'training') toast('❌ Mauvaise réponse');
+  if (state.mode === 'training') {
+    $('explanationBox').innerHTML = `<div class="explanation">💡 ${escapeHtml(q.exp||'Bonne réponse : '+q.a[q.correct])}</div>`;
+    const nextBtn = $('btnNext');
+    nextBtn.style.display = 'block';
+    nextBtn.textContent = state.currentIndex < state.questions.length - 1 ? 'Question suivante →' : 'Voir mon score →';
+  } else {
+    setTimeout(() => {
+      if (state.currentIndex < state.questions.length - 1) { state.currentIndex++; displayQuestion(); }
+      else finishQuiz();
+    }, 800);
+  }
+}
+
+async function finishQuiz() {
+  stopTimer();
+  const total = state.questions.length;
+  const score = state.score;
+  const percent = total > 0 ? score / total : 0;
+  $('finalScore').textContent = `${score}/${total}`;
+  let emoji, msg;
+  if (percent === 1) { emoji = '🏆'; msg = 'PARFAIT ! Champion !'; }
+  else if (percent >= 0.8) { emoji = '🌟'; msg = 'Excellent !'; }
+  else if (percent >= 0.6) { emoji = '👍'; msg = 'Bien joué !'; }
+  else if (percent >= 0.4) { emoji = '💪'; msg = 'Continue !'; }
+  else { emoji = '📚'; msg = 'Révise et réessaie !'; }
+  $('finalMessage').innerHTML = `<span class="emoji">${emoji}</span>${msg}`;
+
+  const isWeekly = state.mode === 'weekly';
+  $('finalLabel').textContent = isWeekly ? `📅 Quiz de la semaine (${catLabel(state.category)})` : `🏋️ Entraînement (${catLabel(state.category)})`;
+  $('syncCard').style.display = 'block';
+  $('syncStatus').innerHTML = '⏳ Envoi…';
+
+  const session = state.activeSessions[state.category];
+  const entry = {
+    playerName: state.playerName,
+    playerNameLower: state.playerName.toLowerCase(),
+    team: state.category,
+    quizId: isWeekly && session ? session.id : 'training',
+    quizLabel: isWeekly && session ? session.label : 'Entraînement libre',
+    theme: state.theme,
+    score: score,
+    total: total,
+    percent: Math.round(percent * 100),
+    timer: state.timerDuration,
+    isTraining: !isWeekly,
+    responses: state.responses.slice()
+  };
+
+  try {
+    await fbAddScore(entry);
+    $('syncStatus').innerHTML = '✅ Score enregistré ! Visible par ton éducateur.';
+    toast('📡 Score synchronisé !');
+  } catch (err) {
+    $('syncStatus').innerHTML = '❌ Erreur : ' + escapeHtml(err.message||err);
+  }
+
+  showScreen('screen-result');
+}
+
+function startTraining() {
+  const name = $('playerName').value.trim();
+  if (!name) { toast('✏️ Entre ton prénom'); return; }
+  state.playerName = name;
+  state.mode = 'training';
+  showScreen('screen-setup');
+}
+
+async function startWeekly() {
+  const name = $('playerName').value.trim();
+  if (!name) { toast('✏️ Entre ton prénom'); return; }
+  const session = state.activeSessions[state.category];
+  if (!session) { toast('❌ Aucun quiz actif pour ' + catLabel(state.category)); return; }
+  try {
+    const prev = await fbHasDoneSession(name, session.id);
+    if (prev) { toast(`🔒 Déjà fait (${prev.score}/${prev.total})`); return; }
+  } catch (e) {}
+  state.playerName = name;
+  state.mode = 'weekly';
+  const sessionQs = session.questionIds.map(id => state.allQuestions.find(q => q.id === id)).filter(Boolean);
+  if (sessionQs.length === 0) { toast('❌ Questions introuvables'); return; }
+  state.questions = sessionQs;
+  state.currentIndex = 0;
+  state.score = 0;
+  state.answered = false;
+  state.responses = [];
+  state.timerDuration = session.timer || 20;
+  state.theme = 'all';
+  showScreen('screen-quiz');
+  displayQuestion();
+}
+
+function startTrainingQuiz() {
+  state.theme = $('themeSelect').value;
+  const mode = $('modeSelect').value;
+  const nb = parseInt($('nbQuestions').value);
+  state.timerDuration = parseInt($('timerSelect').value);
+  let pool = questionsForCategory(state.category);
+  if (state.theme !== 'all') pool = pool.filter(q => q.theme === state.theme);
+  if (pool.length === 0) { toast('❌ Aucune question dans ce thème'); return; }
+  const finalNb = (nb === 999) ? pool.length : Math.min(nb, pool.length);
+  state.mode = mode === 'evaluation' ? 'evaluation' : 'training';
+  state.questions = shuffle(pool).slice(0, finalNb);
+  state.currentIndex = 0;
+  state.score = 0;
+  state.answered = false;
+  state.responses = [];
+  showScreen('screen-quiz');
+  displayQuestion();
+}
+   async function renderLeaderboard() {
+  const container = $('leaderboardContent');
+  const lbl = $('lbCatLabel');
+  if (lbl) lbl.innerHTML = catBadge(state.category);
+  container.innerHTML = '<div class="loader">Chargement…</div>';
+
+  let scores = [];
+  try {
+    scores = await withTimeout(fbGetScoresLight(), 25000, 'classement');
+  } catch (e) {
+    container.innerHTML = `<div class="empty">❌ Impossible de charger le classement.<br><span style="font-size:.7rem;">${escapeHtml(e.message||'')}</span></div>`;
+    return;
+  }
+  scores = scores.filter(s => s && s.playerName && typeof s.score === 'number' && typeof s.total === 'number');
+  scores = scores.filter(s => scoreCategory(s) === state.category);
+
+  const mode = state.lbMode;
+  const session = state.activeSessions[state.category];
+
+  if (mode === 'weekly') {
+    const filtered = scores.filter(s => !s.isTraining);
+    const bySession = {};
+    filtered.forEach(s => {
+      if (!bySession[s.quizId]) bySession[s.quizId] = { label: s.quizLabel || 'Quiz', scores: [] };
+      bySession[s.quizId].scores.push(s);
+    });
+    if (Object.keys(bySession).length === 0) {
+      container.innerHTML = '<div class="empty">Aucun quiz de la semaine terminé pour ' + catLabel(state.category) + '.</div>';
+      return;
+    }
+    let html = '';
+    const activeId = session ? session.id : null;
+    const order = Object.keys(bySession).sort((a, b) => (a === activeId ? -1 : b === activeId ? 1 : 0));
+    for (const sid of order) {
+      const ss = bySession[sid];
+      const isActive = sid === activeId;
+      html += `<div class="session-card ${isActive ? 'active-session' : ''}">`;
+      html += `<div class="s-label">${isActive ? '📅 ' : '📜 '}${escapeHtml(ss.label)}${isActive ? ' <span class="badge-ok">EN COURS</span>' : ''}</div>`;
+      html += `<div class="s-meta">${ss.scores.length} participant(s)</div>`;
+      const ranked = ss.scores.slice().sort((a, b) => (b.percent || 0) - (a.percent || 0) || b.score - a.score);
+      ranked.forEach((s, i) => {
+        const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : '•';
+        html += `<div class="history-item"><span>${medal} <strong>${escapeHtml(s.playerName)}</strong></span><span>${s.score}/${s.total} (${s.percent || 0}%)</span></div>`;
+      });
+      html += '</div>';
+    }
+    container.innerHTML = html;
+
+  } else if (mode === 'global') {
+    const filtered = scores.filter(s => !s.isTraining);
+    if (filtered.length === 0) {
+      container.innerHTML = '<div class="empty">Aucun score officiel pour ' + catLabel(state.category) + '.</div>';
+      return;
+    }
+    const byPlayer = {};
+    filtered.forEach(s => {
+      if (!byPlayer[s.playerName]) byPlayer[s.playerName] = { correct: 0, total: 0, count: 0 };
+      byPlayer[s.playerName].correct += s.score;
+      byPlayer[s.playerName].total += s.total;
+      byPlayer[s.playerName].count++;
+    });
+    const list = Object.keys(byPlayer).map(name => {
+      const p = byPlayer[name];
+      return { name, correct: p.correct, total: p.total, count: p.count,
+        pct: p.total > 0 ? (p.correct / p.total) * 10 : 0 };
+    }).sort((a, b) => b.correct - a.correct || b.pct - a.pct);
+
+    let html = `<div class="card-title" style="margin-bottom:10px;">📊 Points cumulés — ${catLabel(state.category)}</div>`;
+    list.forEach((p, i) => {
+      const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : '•';
+      html += `<div class="player-card">
+        <div class="player-header">
+          <div class="player-name">${medal} ${escapeHtml(p.name)}</div>
+          <div class="player-avg">${p.correct} pts</div>
+        </div>
+        <div class="player-stats">
+          <span>✅ ${p.correct} / ${p.total} bonnes réponses</span>
+          <span>🎯 Moyenne : ${p.pct.toFixed(1)}/10</span>
+          <span>📝 ${p.count} quiz</span>
+        </div>
+      </div>`;
+    });
+    container.innerHTML = html;
+
+  } else {
+    const filtered = scores.filter(s => s.isTraining);
+    if (filtered.length === 0) {
+      container.innerHTML = '<div class="empty">Aucun entraînement enregistré pour ' + catLabel(state.category) + '.</div>';
+      return;
+    }
+    let html = '';
+    filtered.slice(0, 30).forEach(s => {
+      html += `<div class="history-item"><span><strong>${escapeHtml(s.playerName)}</strong> · ${s.score}/${s.total}</span><span class="date">${formatDate(s.createdAt)}</span></div>`;
+    });
+    container.innerHTML = html;
+  }
+}
+
+function renderRoleBadge() {
+  const badge = $('adminRoleBadge');
+  const desc = $('adminRoleDesc');
+  const teamCard = $('adminTeamCard');
+  if (!badge) return;
+  if (state.role === 'super') {
+    badge.innerHTML = '<span class="role-badge role-super">👑 Super Admin</span>';
+    desc.innerHTML = 'Tu as accès à <strong>tout</strong> : U12, U13, questions partagées, paramètres, PINs.';
+    if (teamCard) teamCard.style.display = 'block';
+  } else if (state.role === 'u12') {
+    badge.innerHTML = '<span class="role-badge role-u12">🔵 Éducateur U12</span>';
+    desc.innerHTML = 'Tu gères <strong>uniquement la catégorie U12</strong>. Tu peux ajouter tes propres questions U12, créer des quiz U12 et consulter les résultats U12. Tu ne peux pas toucher aux questions partagées.';
+    if (teamCard) teamCard.style.display = 'none';
+  } else if (state.role === 'u13') {
+    badge.innerHTML = '<span class="role-badge role-u13">🟠 Éducateur U13</span>';
+    desc.innerHTML = 'Tu gères <strong>uniquement la catégorie U13</strong>. Tu peux ajouter tes propres questions U13, créer des quiz U13 et consulter les résultats U13. Tu ne peux pas toucher aux questions partagées.';
+    if (teamCard) teamCard.style.display = 'none';
+  }
+  const b1 = $('btnChangePin'); if (b1) b1.style.display = state.role === 'super' ? 'block' : 'none';
+  const b2 = $('btnResetAll');  if (b2) b2.style.display = state.role === 'super' ? 'block' : 'none';
+  const b3 = $('noParams');     if (b3) b3.style.display = state.role === 'super' ? 'none' : 'block';
+
+  const c = state.adminCategory;
+  ['dashCat','weeklyCatLabel','playersCatLabel','qsCatLabel','weeklyCreateCat','sessionsCatLabel','resultsCatLabel'].forEach(id => {
+    const el = $(id);
+    if (el) el.innerHTML = catBadge(c);
+  });
+}
+
+async function renderAdmin() {
+  if (state.role === 'u12') state.adminCategory = 'u12';
+  if (state.role === 'u13') state.adminCategory = 'u13';
+  renderRoleBadge();
+
+  let scores = [];
+  try { scores = await withTimeout(fbGetScoresLight(), 20000, 'admin'); } catch (e) {}
+  const catScores = scores.filter(s => scoreCategory(s) === state.adminCategory);
+  const players = new Set(catScores.map(s => s.playerNameLower));
+  const weeklyScores = catScores.filter(s => !s.isTraining);
+  const qs = questionsForCategory(state.adminCategory);
+  $('adminStats').innerHTML = `
+    <div class="mini-stat"><span class="n">${players.size}</span><span class="l">Joueurs</span></div>
+    <div class="mini-stat"><span class="n">${qs.length}</span><span class="l">Questions</span></div>
+    <div class="mini-stat"><span class="n">${weeklyScores.length}</span><span class="l">Quiz faits</span></div>
+  `;
+  const wi = $('adminWeeklyInfo');
+  const session = state.activeSessions[state.adminCategory];
+  if (session) {
+    const done = weeklyScores.filter(s => s.quizId === session.id).length;
+    wi.innerHTML = `📅 <strong>${escapeHtml(session.label)}</strong><br>${session.questionIds.length} questions · ${done} participant(s) sur ${players.size}`;
+  } else {
+    wi.textContent = `Aucun quiz actif pour ${catLabel(state.adminCategory)}.`;
+  }
+  renderThemeCounts();
+}
+
+async function renderAllResults() {
+  const container = $('allResults');
+  const lbl = $('resultsCatLabel');
+  if (lbl) lbl.innerHTML = catBadge(state.adminCategory);
+  container.innerHTML = '<div class="loader">Chargement…</div>';
+  let scores = [];
+  try {
+    scores = await withTimeout(fbGetScoresFull(), 30000, 'résultats');
+  } catch (e) {
+    container.innerHTML = `<div class="empty">❌ Erreur : ${escapeHtml(e.message||'inconnue')}</div>`;
+    return;
+  }
+  scores = scores.filter(s => scoreCategory(s) === state.adminCategory);
+
+  const search = ($('searchPlayer').value || '').toLowerCase().trim();
+  if (search) scores = scores.filter(s => (s.playerNameLower||'').includes(search));
+  if (scores.length === 0) { container.innerHTML = '<div class="empty">Aucun résultat pour ' + catLabel(state.adminCategory) + '</div>'; return; }
+
+  const byPlayer = {};
+  for (const s of scores) {
+    if (!byPlayer[s.playerName]) byPlayer[s.playerName] = [];
+    byPlayer[s.playerName].push(s);
+  }
+
+  let html = '';
+  const names = Object.keys(byPlayer).sort();
+  for (const name of names) {
+    const list = byPlayer[name];
+    let totalCorrect = 0, totalQ = 0;
+    for (const s of list) { totalCorrect += s.score; totalQ += s.total; }
+    const avg = totalQ > 0 ? (totalCorrect / totalQ * 10).toFixed(1) : '0.0';
+
+    html += `<div class="player-card player-clickable" data-name="${escapeHtml(name)}">
+      <div class="player-header">
+        <div class="player-name">👤 ${escapeHtml(name)}</div>
+        <div class="player-avg">${totalCorrect} pts</div>
+      </div>
+      <div class="player-stats">
+        <span>✅ ${totalCorrect} / ${totalQ} bonnes réponses</span>
+        <span>🎯 Moyenne : ${avg}/10</span>
+        <span>📝 ${list.length} quiz</span>
+        <span style="color:var(--or);">👁️ Voir le détail →</span>
+      </div>
+    </div>`;
+  }
+  container.innerHTML = html;
+  container.querySelectorAll('.player-clickable').forEach(card => {
+    card.addEventListener('click', () => showPlayerDetail(card.dataset.name, scores));
+  });
+}
+        function showPlayerDetail(name, allScores) {
+  const list = allScores.filter(s => s.playerName === name);
+  const container = $('playerDetailContent');
+
+  let totalCorrect = 0, totalQ = 0;
+  for (const s of list) { totalCorrect += s.score; totalQ += s.total; }
+  const avg = totalQ > 0 ? (totalCorrect / totalQ * 10).toFixed(1) : '0.0';
+
+  let html = `<div class="card">
+    <div class="card-title">👤 ${escapeHtml(name)} — Bulletin détaillé ${catBadge(state.adminCategory)}</div>
+    <div class="player-card" style="border-color:var(--or);">
+      <div class="player-header">
+        <div class="player-name">📊 Cumul global</div>
+        <div class="player-avg">${totalCorrect} pts</div>
+      </div>
+      <div class="player-stats">
+        <span>✅ ${totalCorrect} / ${totalQ} bonnes réponses</span>
+        <span>🎯 Moyenne : ${avg}/10</span>
+        <span>📝 ${list.length} quiz passés</span>
+      </div>
+    </div>
+  </div>`;
+
+  list.sort((a, b) => {
+    const da = a.createdAt && a.createdAt.toDate ? a.createdAt.toDate() : new Date(a.createdAt || 0);
+    const db_ = b.createdAt && b.createdAt.toDate ? b.createdAt.toDate() : new Date(b.createdAt || 0);
+    return db_ - da;
+  });
+
+  for (const s of list) {
+    const pct = s.total > 0 ? (s.score / s.total * 10).toFixed(1) : '0.0';
+    const couleur = pct >= 8 ? 'var(--vert)' : pct >= 5 ? 'var(--or)' : 'var(--rouge)';
+    html += `<div class="card" style="margin-top:12px;border-left:3px solid ${couleur};">
+      <div class="player-header">
+        <div class="player-name">${s.isTraining ? '🏋️' : '📅'} ${escapeHtml(s.quizLabel || '')}</div>
+        <div class="player-avg" style="color:${couleur};">${s.score}/${s.total} — ${pct}/10</div>
+      </div>
+      <div class="player-stats" style="margin-bottom:10px;">
+        <span>📅 ${formatDate(s.createdAt)}</span>
+        <span>⏱️ ${s.timer === 0 ? 'Sans limite' : (s.timer || 0) + 's'}</span>
+      </div>`;
+    if (s.responses && s.responses.length) {
+      s.responses.forEach((r, i) => {
+        const icon = r.isCorrect ? '✅' : (r.timeout ? '⏰' : '❌');
+        const bc = r.isCorrect ? 'var(--vert)' : 'var(--rouge)';
+        html += `<div class="detail-q-item" style="border-left:3px solid ${bc};">
+          <div class="detail-q-head">${icon} Q${i+1} · ${escapeHtml(themeLabel(r.theme))}</div>
+          <div class="detail-q-text">${escapeHtml(r.q)}</div>`;
+        (r.options || []).forEach((opt, o) => {
+          let cls = 'detail-opt ';
+          let prefix = '';
+          if (o === r.correctIdx && o === r.selectedIdx) { cls += 'ok-selected'; prefix = '✅ '; }
+          else if (o === r.correctIdx) { cls += 'ok-not-selected'; prefix = '✔️ '; }
+          else if (o === r.selectedIdx) { cls += 'ko-selected'; prefix = '❌ '; }
+          else { cls += 'neutral'; }
+          html += `<div class="${cls}">${prefix}${escapeHtml(opt)}</div>`;
+        });
+        if (r.timeout) html += `<div class="detail-timeout">⏰ Temps écoulé — aucune réponse cochée</div>`;
+        if (r.exp) html += `<div class="detail-exp">💡 ${escapeHtml(r.exp)}</div>`;
+        html += `</div>`;
+      });
+    } else {
+      html += `<div style="font-size:.72rem;color:var(--dim);font-style:italic;">⚠️ Détail non disponible (score enregistré avant la mise à jour)</div>`;
+    }
+    html += `</div>`;
+  }
+  container.innerHTML = html;
+  showScreen('screen-player-detail');
+}
+
+async function renderQuestionsList(filterMode) {
+  const container = $('questionsList');
+  container.innerHTML = '<div class="loader">Chargement…</div>';
+
+  let qs = state.allQuestions.slice();
+
+  if (filterMode === 'mine') {
+    qs = qs.filter(q => (q.team || 'both') === state.adminCategory);
+  } else {
+    qs = qs.filter(q => {
+      const t = q.team || 'both';
+      return t === 'both' || t === state.adminCategory;
+    });
+  }
+
+  if (qs.length === 0) { container.innerHTML = '<div class="empty">Aucune question</div>'; return; }
+
+  let html = '';
+  qs.forEach(q => {
+    const t = q.team || 'both';
+    const editable = canEditQuestion(q);
+    const delBtn = editable
+      ? `<span class="q-del" data-id="${q.id}">×</span>`
+      : `<span class="q-lock" title="Non modifiable">🔒</span>`;
+    html += `<div class="question-item"><span class="q-text">${catBadge(t)} <strong>${escapeHtml(themeLabel(q.theme))}</strong> — ${escapeHtml(q.q)}</span>${delBtn}</div>`;
+  });
+  container.innerHTML = html;
+
+  container.querySelectorAll('.q-del').forEach(el => {
+    el.addEventListener('click', async () => {
+      if (!confirm('Supprimer cette question ?')) return;
+      try {
+        await fbDeleteQuestion(el.dataset.id);
+        state.allQuestions = state.allQuestions.filter(q => q.id !== el.dataset.id);
+        renderQuestionsList(filterMode);
+        renderThemeCounts();
+        toast('🗑️ Supprimée');
+      } catch (e) { toast('❌ Erreur'); }
+    });
+  });
+}
+
+async function renderSessions() {
+  const container = $('sessionsList');
+  const lbl = $('sessionsCatLabel');
+  if (lbl) lbl.innerHTML = catBadge(state.adminCategory);
+  container.innerHTML = '<div class="loader">Chargement…</div>';
+  let sessions = [];
+  try { sessions = await withTimeout(fbGetSessions(), 20000, 'sessions'); } catch (e) {
+    container.innerHTML = '<div class="empty">Erreur</div>'; return;
+  }
+  sessions = sessions.filter(s => (s.team || 'u13') === state.adminCategory);
+  if (sessions.length === 0) { container.innerHTML = '<div class="empty">Aucun quiz créé pour ' + catLabel(state.adminCategory) + '</div>'; return; }
+  let scores = [];
+  try { scores = await withTimeout(fbGetScoresLight(), 20000, 'scores'); } catch (e) {}
+  const session = state.activeSessions[state.adminCategory];
+  let html = '';
+  for (const s of sessions) {
+    const done = scores.filter(x => x.quizId === s.id).length;
+    const isActive = session && session.id === s.id;
+    html += `<div class="session-card ${isActive ? 'active-session' : ''}"><div class="s-label">${isActive ? '📅 ' : '📜 '}${escapeHtml(s.label)}${isActive ? ' <span class="badge-ok">ACTIF</span>' : ''}</div><div class="s-meta"><span>📝 ${s.questionIds.length} questions</span><span>👥 ${done} participant(s)</span><span>📅 ${formatDate(s.createdAt)}</span></div>${!isActive ? `<button class="btn btn-or btn-small" data-reactivate="${s.id}" style="margin-top:8px;">🔄 Réactiver</button>` : ''}</div>`;
+  }
+  container.innerHTML = html;
+  container.querySelectorAll('[data-reactivate]').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      try {
+        const cfg = await fbGetConfig();
+        const sessions = cfg.activeSessions || {};
+        sessions[state.adminCategory] = btn.dataset.reactivate;
+        await fbSetConfig({ activeSessions: sessions });
+        state.activeSessions = await fbGetActiveSessions();
+        toast('✅ Réactivé');
+        renderSessions();
+        renderWeeklyCard();
+      } catch (e) { toast('❌ Erreur'); }
+    });
+  });
+}
+
+async function createWeeklyQuiz() {
+  const cat = state.adminCategory;
+  const label = $('weeklyLabel').value.trim() || `Quiz ${catLabel(cat)} du ${new Date().toLocaleDateString('fr-FR')}`;
+  const nb = parseInt($('weeklyNb').value);
+  const theme = $('weeklyTheme').value;
+  const timer = parseInt($('weeklyTimer').value);
+  let pool = questionsForCategory(cat);
+  if (theme !== 'all') pool = pool.filter(q => q.theme === theme);
+  if (pool.length < nb) { toast(`❌ Seulement ${pool.length} questions`); return; }
+  const selected = shuffle(pool).slice(0, nb).map(q => q.id);
+  try {
+    await fbCreateSession({ label, questionIds: selected, timer }, cat);
+    state.activeSessions = await fbGetActiveSessions();
+    toast('✅ Quiz publié !');
+    $('weeklyLabel').value = '';
+    await renderAdmin();
+    showScreen('screen-admin');
+  } catch (e) { toast('❌ Erreur'); }
+}
+
+async function saveQuestion() {
+  const themeCustom = $('newThemeCustom').value.trim().toLowerCase();
+  const theme = themeCustom || $('newTheme').value;
+  const question = $('newQuestion').value.trim();
+  const a0 = $('ans0').value.trim(), a1 = $('ans1').value.trim(), a2 = $('ans2').value.trim(), a3 = $('ans3').value.trim();
+  const exp = $('newExplanation').value.trim();
+  if (!question) { toast('❌ Écris la question'); return; }
+  if (!a0||!a1||!a2||!a3) { toast('❌ Remplis les 4 réponses'); return; }
+  const radio = document.querySelector('input[name="correct"]:checked');
+  const correct = radio ? parseInt(radio.value) : 0;
+
+  let team;
+  if (state.role === 'super') {
+    team = $('newTeam').value || 'both';
+  } else if (state.role === 'u12') {
+    team = 'u12';
+  } else if (state.role === 'u13') {
+    team = 'u13';
+  } else {
+    team = 'both';
+  }
+
+  try {
+    await fbAddQuestion({
+      theme, q: question, a: [a0,a1,a2,a3], correct,
+      exp: exp || `Bonne réponse : ${[a0,a1,a2,a3][correct]}`,
+      team
+    });
+    if (themeCustom && !THEMES.find(t => t.id === themeCustom)) {
+      const custom = (state.config.customThemes || []).concat([{ id: themeCustom, label: themeCustom }]);
+      await fbSetConfig({ customThemes: custom });
+      state.config.customThemes = custom;
+      THEMES.push({ id: themeCustom, label: themeCustom });
+    }
+    state.allQuestions = await fbGetQuestions();
+    ['newQuestion','ans0','ans1','ans2','ans3','newExplanation','newThemeCustom'].forEach(id => $(id).value = '');
+    document.querySelector('input[name="correct"][value="0"]').checked = true;
+    renderThemeCounts(); renderThemeSelects();
+    toast('✅ Question ajoutée !');
+  } catch (e) { toast('❌ Erreur'); }
+}
+
+async function bulkImport() {
+  const raw = $('bulkJson').value.trim();
+  if (!raw) { toast('❌ Collez du JSON'); return; }
+  let arr;
+  try { arr = JSON.parse(raw); } catch (e) { toast('❌ JSON invalide'); return; }
+  if (!Array.isArray(arr)) { toast('❌ Ce n\'est pas un tableau'); return; }
+
+  let team;
+  if (state.role === 'super') team = $('newTeam') ? ($('newTeam').value || 'both') : 'both';
+  else if (state.role === 'u12') team = 'u12';
+  else if (state.role === 'u13') team = 'u13';
+  else team = 'both';
+
+  let ok = 0, fail = 0;
+  for (const q of arr) {
+    if (!q.q || !q.a || q.a.length !== 4 || typeof q.correct !== 'number') { fail++; continue; }
+    try {
+      await fbAddQuestion({ theme: q.theme||'regles', q: q.q, a: q.a, correct: q.correct, exp: q.exp||'', team });
+      ok++;
+    } catch (e) { fail++; }
+  }
+  state.allQuestions = await fbGetQuestions();
+  renderThemeCounts(); renderThemeSelects();
+  $('bulkJson').value = '';
+  toast(`✅ ${ok} importée(s)${fail ? `, ${fail} échec(s)` : ''}`);
+}
+
+function bind(id, fn) {
+  const el = $(id);
+  if (el) el.addEventListener('click', fn);
+}
+
+function setupBindings() {
+  bind('btnCatU13', () => { state.category = 'u13'; renderCategoryBanner(); renderWeeklyCard(); showScreen('screen-home'); });
+  bind('btnCatU12', () => { state.category = 'u12'; renderCategoryBanner(); renderWeeklyCard(); showScreen('screen-home'); });
+  bind('btnChangeCat', () => showScreen('screen-category'));
+
+  bind('btnTraining', startTraining);
+  bind('btnWeekly', startWeekly);
+  bind('btnLeaderboard', async () => { showScreen('screen-leaderboard'); await renderLeaderboard(); });
+  bind('btnEducator', () => { $('pinInput').value = ''; showScreen('screen-pin'); });
+  bind('btnRetry', () => location.reload());
+
+  const nameEl = $('playerName');
+  if (nameEl) nameEl.addEventListener('input', renderWeeklyCard);
+
+  bind('btnStart', startTrainingQuiz);
+  bind('btnBack', () => showScreen('screen-home'));
+
+  bind('btnNext', () => {
+    if (state.currentIndex < state.questions.length - 1) { state.currentIndex++; displayQuestion(); }
+    else finishQuiz();
+  });
+
+  bind('btnShare', () => {
+    const total = state.questions.length;
+    const text = `⚽ Quiz Trélissac FC — ${catLabel(state.category)}\n👤 ${state.playerName}\n🎯 Score : ${state.score}/${total}\n📅 ${new Date().toLocaleDateString('fr-FR')}`;
+    if (navigator.share) navigator.share({ title: 'Mon score', text: text }).catch(() => {});
+    else if (navigator.clipboard) navigator.clipboard.writeText(text).then(() => toast('📋 Copié !'));
+    else prompt('Copie ton score :', text);
+  });
+
+  bind('btnHome', async () => { await refreshAllData(); showScreen('screen-home'); });
+
+  bind('btnPinBack', () => showScreen('screen-category'));
+  bind('btnPinValidate', async () => {
+    const entered = ($('pinInput').value || '').trim();
+    const role = roleFromPin(entered);
+    if (role) {
+      state.role = role;
+      if (role === 'u12') state.adminCategory = 'u12';
+      if (role === 'u13') state.adminCategory = 'u13';
+      $('pinInput').value = '';
+      await renderAdmin();
+      showScreen('screen-admin');
+      const labels = { super: 'Super Admin', u12: 'Éducateur U12', u13: 'Éducateur U13' };
+      toast('✅ Connecté — ' + labels[role]);
+    } else toast('❌ Code PIN incorrect');
+  });
+  const pinInput = $('pinInput');
+  if (pinInput) pinInput.addEventListener('keypress', e => { if (e.key === 'Enter') $('btnPinValidate').click(); });
+
+  document.querySelectorAll('[data-lb]').forEach(tab => {
+    tab.addEventListener('click', async () => {
+      document.querySelectorAll('[data-lb]').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      state.lbMode = tab.dataset.lb;
+      await renderLeaderboard();
+    });
+  });
+  bind('btnBackHome', () => showScreen('screen-home'));
+
+  document.querySelectorAll('[data-admincat]').forEach(tab => {
+    tab.addEventListener('click', async () => {
+      document.querySelectorAll('[data-admincat]').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      state.adminCategory = tab.dataset.admincat;
+      await renderAdmin();
+    });
+  });
+
+  bind('btnAdminBack', () => {
+    state.role = null;
+    showScreen('screen-category');
+  });
+  bind('btnCreateWeekly', () => {
+    $('weeklyLabel').value = `Quiz ${catLabel(state.adminCategory)} du ${new Date().toLocaleDateString('fr-FR')}`;
+    showScreen('screen-admin-weekly');
+  });
+  bind('btnWeeklyHistory', async () => { await renderSessions(); showScreen('screen-admin-sessions'); });
+  bind('btnManageQuestions', async () => { await renderQuestionsList('all'); showScreen('screen-admin-questions'); });
+  bind('btnAdminResults', async () => { await renderAllResults(); showScreen('screen-admin-results'); });
+  bind('btnUnlockPlayer', async () => {
+    const cat = state.adminCategory;
+    const name = prompt(`Prénom du joueur à débloquer (${catLabel(cat)}) :`);
+    if (!name) return;
+    const session = state.activeSessions[cat];
+    if (!session) { toast('❌ Aucun quiz actif'); return; }
+    try {
+      const scores = await fbFindScoresByName(name);
+      const toDelete = scores.filter(s => s.quizId === session.id && (s.team || 'u13') === cat);
+      for (const s of toDelete) await fbDeleteScore(s.id);
+      toast(`✅ ${toDelete.length} résultat(s) supprimé(s)`);
+      await renderAdmin();
+    } catch (e) { toast('❌ Erreur'); }
+  });
+  bind('btnChangePin', async () => {
+    const which = prompt('Quel PIN changer ? (super / u12 / u13)', 'super');
+    if (!['super','u12','u13'].includes(which)) return;
+    const newPin = prompt(`Nouveau PIN ${which} (4 chiffres) :`);
+    if (!newPin || newPin.length < 4) { toast('❌ PIN trop court'); return; }
+    try {
+      const pins = getPins();
+      pins[which] = newPin;
+      await fbSetConfig({ pins });
+      state.config.pins = pins;
+      toast('✅ PIN modifié');
+    } catch (e) { toast('❌ Erreur'); }
+  });
+  bind('btnResetAll', async () => {
+    const cat = state.adminCategory;
+    if (!confirm(`⚠️ SUPPRIMER TOUS LES SCORES ${catLabel(cat)} ? (Les questions sont conservées.)`)) return;
+    try {
+      const scores = await fbGetScoresFull();
+      const toDelete = scores.filter(s => (s.team || 'u13') === cat);
+      for (const s of toDelete) await fbDeleteScore(s.id);
+      toast(`🗑️ ${toDelete.length} score(s) supprimé(s)`);
+      await renderAdmin();
+    } catch (e) { toast('❌ Erreur'); }
+  });
+
+  document.querySelectorAll('[data-qfilter]').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('[data-qfilter]').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      const f = tab.dataset.qfilter;
+      if (f === 'add') {
+        $('editorTitle').textContent = '➕ Ajouter une question';
+        const teamField = $('teamChoiceField');
+        if (teamField) teamField.style.display = state.role === 'super' ? 'block' : 'none';
+        const sel = $('newTeam');
+        if (sel) {
+          if (state.role === 'super') sel.value = 'both';
+          else sel.value = state.adminCategory;
+        }
+        showScreen('screen-admin-editor');
+      }
+      else renderQuestionsList(f);
+    });
+  });
+  bind('btnAddQuestion', () => {
+    $('editorTitle').textContent = '➕ Ajouter une question';
+    const teamField = $('teamChoiceField');
+    if (teamField) teamField.style.display = state.role === 'super' ? 'block' : 'none';
+    const sel = $('newTeam');
+    if (sel) sel.value = state.role === 'super' ? 'both' : state.adminCategory;
+    showScreen('screen-admin-editor');
+  });
+  bind('btnBulkImport', () => {
+    const hint = $('bulkTeamHint');
+    if (hint) {
+      if (state.role === 'super') hint.textContent = '👑 Toutes les questions importées seront PARTAGÉES (U12+U13) par défaut.';
+      else hint.textContent = `🔒 Toutes les questions importées seront marquées ${catLabel(state.adminCategory)} uniquement.`;
+    }
+    showScreen('screen-admin-bulk');
+  });
+  bind('btnQuestionsBack', () => showScreen('screen-admin'));
+  bind('btnSaveQuestion', saveQuestion);
+  bind('btnEditorBack', () => { renderQuestionsList('all'); showScreen('screen-admin-questions'); });
+  bind('btnBulkSave', bulkImport);
+  bind('btnBulkBack', () => showScreen('screen-admin-questions'));
+  bind('btnWeeklySave', createWeeklyQuiz);
+  bind('btnWeeklyBack', () => showScreen('screen-admin'));
+  bind('btnSessionsBack', () => showScreen('screen-admin'));
+  bind('btnResultsBack', () => showScreen('screen-admin'));
+  bind('btnDetailBack', async () => { await renderAllResults(); showScreen('screen-admin-results'); });
+
+  const sp = $('searchPlayer');
+  if (sp) sp.addEventListener('input', () => { clearTimeout(window.__srch); window.__srch = setTimeout(renderAllResults, 300); });
+}
+
+setupBindings();
+init();
+</script>
+</body>
+</html>
